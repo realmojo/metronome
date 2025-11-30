@@ -1,10 +1,10 @@
+import { usePathname, useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
-import { useRouter, usePathname } from "expo-router";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export function HeaderMenu() {
   const router = useRouter();
@@ -31,9 +31,7 @@ export function HeaderMenu() {
               active && {
                 borderBottomWidth: 2,
                 borderBottomColor:
-                  colorScheme === "dark"
-                    ? Colors.dark.tint
-                    : Colors.light.tint,
+                  colorScheme === "dark" ? Colors.dark.tint : Colors.light.tint,
               },
             ]}
           >
@@ -76,4 +74,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-

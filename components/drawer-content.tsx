@@ -5,12 +5,10 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useDrawer } from "@/components/use-drawer";
 import { Colors } from "@/constants/theme";
-import { useTheme } from "@/contexts/theme-context";
 
 export function DrawerContent() {
   const router = useRouter();
   const pathname = usePathname();
-  const { effectiveTheme } = useTheme();
   const { closeDrawer } = useDrawer();
 
   const menuItems = [
@@ -26,7 +24,7 @@ export function DrawerContent() {
     closeDrawer();
   };
 
-  const borderColor = effectiveTheme === "dark" ? "#333" : "#e0e0e0";
+  const borderColor = "#333";
 
   return (
     <ThemedView style={styles.container}>
@@ -46,10 +44,7 @@ export function DrawerContent() {
                 style={[
                   styles.menuItem,
                   active && {
-                    backgroundColor:
-                      effectiveTheme === "dark"
-                        ? Colors.dark.tint + "20"
-                        : Colors.light.tint + "20",
+                    backgroundColor: Colors.dark.tint + "20",
                   },
                 ]}
               >
@@ -57,10 +52,7 @@ export function DrawerContent() {
                   style={[
                     styles.menuText,
                     active && {
-                      color:
-                        effectiveTheme === "dark"
-                          ? Colors.dark.tint
-                          : Colors.light.tint,
+                      color: Colors.dark.tint,
                       fontWeight: "600",
                     },
                   ]}

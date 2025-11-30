@@ -1,35 +1,28 @@
 import {
   DarkTheme,
-  DefaultTheme,
   ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import mobileAds from "react-native-google-mobile-ads";
 import "react-native-reanimated";
 
 import { DrawerMenuButton } from "@/components/drawer-menu-button";
 import { DrawerProvider } from "@/components/drawer-provider";
 import { Colors } from "@/constants/theme";
-import { ThemeProvider, useTheme } from "@/contexts/theme-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 function AppContent() {
-  const { effectiveTheme } = useTheme();
-
   return (
-    <NavigationThemeProvider
-      value={effectiveTheme === "dark" ? DarkTheme : DefaultTheme}
-    >
+    <NavigationThemeProvider value={DarkTheme}>
       <DrawerProvider>
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor:
-                effectiveTheme === "dark"
-                  ? Colors.dark.background
-                  : Colors.light.background,
+              backgroundColor: Colors.dark.background,
             },
-            headerTintColor:
-              effectiveTheme === "dark" ? Colors.dark.text : Colors.light.text,
+            headerTintColor: Colors.dark.text,
             headerTitleStyle: {
               fontWeight: "bold",
             },
@@ -72,12 +65,24 @@ function AppContent() {
           />
         </Stack>
       </DrawerProvider>
-      <StatusBar style={effectiveTheme === "dark" ? "light" : "dark"} />
+      <StatusBar style="light" />
     </NavigationThemeProvider>
   );
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Google Mobile Ads 초기화
+    mobileAds()
+      .initialize()
+      .then((adapterStatuses) => {
+        console.log("Mobile Ads initialized", adapterStatuses);
+      })
+      .catch((error) => {
+        console.error("Mobile Ads initialization error:", error);
+      });
+  }, []);
+
   return (
     <ThemeProvider>
       <AppContent />

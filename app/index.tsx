@@ -1,16 +1,13 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
-import { useTheme } from "@/contexts/theme-context";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { effectiveTheme } = useTheme();
 
   const menuItems = [
     {
@@ -23,26 +20,21 @@ export default function HomeScreen() {
       path: "/chords",
       icon: "library-music" as const,
     },
+    {
+      label: "설정",
+      path: "/settings",
+      icon: "settings" as const,
+    },
   ];
 
-  const backgroundColor =
-    effectiveTheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const textColor =
-    effectiveTheme === "dark" ? Colors.dark.text : Colors.light.text;
-  const tintColor =
-    effectiveTheme === "dark" ? Colors.dark.tint : Colors.light.tint;
-  const borderColor = effectiveTheme === "dark" ? "#333" : "#e0e0e0";
+  const backgroundColor = Colors.dark.background;
+  const textColor = Colors.dark.text;
+  const tintColor = Colors.dark.tint;
+  const borderColor = "#333";
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
-        {/* 로고 */}
-        <Image
-          source={require("@/assets/images/metronome-logo.png")}
-          style={styles.logo}
-          contentFit="contain"
-        />
-
         {/* 메뉴 버튼들 */}
         <ThemedView style={styles.menuContainer}>
           {menuItems.map((item) => (
