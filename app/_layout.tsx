@@ -32,31 +32,31 @@ function AppContent() {
           <Stack.Screen
             name="index"
             options={{
-              title: "홈",
+              title: "Metronome & Chords",
             }}
           />
           <Stack.Screen
             name="metronome"
             options={{
-              title: "메트로놈",
+              title: "Metronome",
             }}
           />
           <Stack.Screen
             name="chords"
             options={{
-              title: "음악적 코드",
+              title: "Random Chords",
+            }}
+          />
+          <Stack.Screen
+            name="chords-play"
+            options={{
+              title: "Play Random Chords",
             }}
           />
           <Stack.Screen
             name="settings"
             options={{
-              title: "설정",
-            }}
-          />
-          <Stack.Screen
-            name="explore"
-            options={{
-              title: "Explore",
+              title: "Settings",
             }}
           />
           <Stack.Screen

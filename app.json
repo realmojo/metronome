@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "메트로놈 코드",
+    "name": "Metronome Chords",
     "slug": "metronome",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,7 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/metronome-logo.png",
+          "image": "./assets/images/metronome-logo-text-removebg.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#000000"

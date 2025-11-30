@@ -12,9 +12,9 @@ export function DrawerContent() {
   const { closeDrawer } = useDrawer();
 
   const menuItems = [
-    { label: "메트로놈", path: "/metronome" },
-    { label: "코드", path: "/chords" },
-    { label: "설정", path: "/settings" },
+    { label: "Metronome", path: "/metronome" },
+    { label: "Random Chords", path: "/chords" },
+    { label: "Settings", path: "/settings" },
   ];
 
   const isActive = (path: string) => pathname === path;
@@ -31,7 +31,7 @@ export function DrawerContent() {
       <ScrollView style={styles.scrollView}>
         <ThemedView style={[styles.header, { borderBottomColor: borderColor }]}>
           <ThemedText type="title" style={styles.headerTitle}>
-            Metronome
+            Metronome App
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.menuContainer}>

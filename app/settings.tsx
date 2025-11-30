@@ -18,24 +18,23 @@ export default function SettingsScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
-
         {/* 사운드 설정 */}
         <ThemedView style={styles.section}>
           <ThemedText
             type="subtitle"
             style={[styles.sectionTitle, { color: textColor }]}
           >
-            사운드
+            Sound
           </ThemedText>
           <ThemedView style={styles.settingRow}>
             <ThemedView style={styles.settingInfo}>
               <ThemedText style={[styles.settingLabel, { color: textColor }]}>
-                메트로놈 소리
+                Metronome Sound
               </ThemedText>
               <ThemedText
                 style={[styles.settingDescription, { color: textColor }]}
               >
-                비트마다 소리 재생
+                Play sound on each beat
               </ThemedText>
             </ThemedView>
             <Switch
@@ -47,48 +46,20 @@ export default function SettingsScreen() {
           </ThemedView>
         </ThemedView>
 
-        {/* 햅틱 설정 */}
-        {/* <ThemedView style={styles.section}>
-          <ThemedText
-            type="subtitle"
-            style={[styles.sectionTitle, { color: textColor }]}
-          >
-            햅틱
-          </ThemedText>
-          <ThemedView style={styles.settingRow}>
-            <ThemedView style={styles.settingInfo}>
-              <ThemedText style={[styles.settingLabel, { color: textColor }]}>
-                햅틱 피드백
-              </ThemedText>
-              <ThemedText
-                style={[styles.settingDescription, { color: textColor }]}
-              >
-                비트마다 진동 피드백
-              </ThemedText>
-            </ThemedView>
-            <Switch
-              value={hapticsEnabled}
-              onValueChange={setHapticsEnabled}
-              trackColor={{ false: borderColor, true: tintColor + "80" }}
-              thumbColor={hapticsEnabled ? tintColor : "#f4f3f4"}
-            />
-          </ThemedView>
-        </ThemedView> */}
-
         {/* 앱 정보 */}
         <ThemedView style={styles.section}>
           <ThemedText
             type="subtitle"
             style={[styles.sectionTitle, { color: textColor }]}
           >
-            앱 정보
+            App Info
           </ThemedText>
           <ThemedView style={styles.infoRow}>
             <ThemedText style={[styles.infoLabel, { color: textColor }]}>
-              버전
+              Version
             </ThemedText>
             <ThemedText style={[styles.infoValue, { color: textColor }]}>
-              1.0.0
+              v1.0.0
             </ThemedText>
           </ThemedView>
         </ThemedView>

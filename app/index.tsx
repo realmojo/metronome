@@ -1,4 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 
@@ -11,30 +12,29 @@ export default function HomeScreen() {
 
   const menuItems = [
     {
-      label: "메트로놈",
+      label: "Metronome",
       path: "/metronome",
       icon: "music-note" as const,
     },
     {
-      label: "코드",
+      label: "Random Chords",
       path: "/chords",
       icon: "library-music" as const,
-    },
-    {
-      label: "설정",
-      path: "/settings",
-      icon: "settings" as const,
     },
   ];
 
   const backgroundColor = Colors.dark.background;
-  const textColor = Colors.dark.text;
   const tintColor = Colors.dark.tint;
-  const borderColor = "#333";
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
+        {/* 로고 */}
+        <Image
+          source={require("@/assets/images/metronome-logo-removebg.png")}
+          style={styles.logo}
+          contentFit="contain"
+        />
         {/* 메뉴 버튼들 */}
         <ThemedView style={styles.menuContainer}>
           {menuItems.map((item) => (
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: "center",
     justifyContent: "center",
-    gap: 48,
+    gap: 32,
   },
   logo: {
     width: 200,

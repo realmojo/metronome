@@ -12,8 +12,8 @@ export function HeaderMenu() {
   const colorScheme = useColorScheme();
 
   const menuItems = [
-    { label: "메트로놈", path: "/metronome" },
-    { label: "음악적 코드", path: "/chords" },
+    { label: "Metronome", path: "/metronome" },
+    { label: "Random Chords", path: "/chords" },
   ];
 
   const isActive = (path: string) => pathname === path;

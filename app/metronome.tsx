@@ -1,14 +1,16 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Slider from "@react-native-community/slider";
 import { useAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
+  TextInput,
   View,
 } from "react-native";
 import {
@@ -20,10 +22,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { MetronomeHeaderButtons } from "@/components/metronome-header-buttons";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
+import { useNavigation } from "expo-router";
 
 const MIN_BPM = 20;
 const MAX_BPM = 300;
@@ -50,7 +55,21 @@ const TEMPO_MARKINGS = [
   { name: "Prestissimo", nameKo: "프레스티시모", bpm: 200 },
 ];
 
+type MetronomePreset = {
+  id: string;
+  name: string;
+  bpm: number;
+  beatPerBar: number;
+  clickPerBeat: number;
+  tempoName: string;
+  createdAt: number;
+};
+
+const PRESETS_STORAGE_KEY = "@metronome:presets";
+
 export default function MetronomeScreen() {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [isPlaying, setIsPlaying] = useState(false);
   const [beatPerBar, setBeatPerBar] = useState(4);
@@ -59,6 +78,10 @@ export default function MetronomeScreen() {
   const [currentBeat, setCurrentBeat] = useState(0);
   const [showBeatPerBarOptions, setShowBeatPerBarOptions] = useState(false);
   const [showClickPerBeatOptions, setShowClickPerBeatOptions] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showPresetsModal, setShowPresetsModal] = useState(false);
+  const [presetName, setPresetName] = useState("");
+  const [presets, setPresets] = useState<MetronomePreset[]>([]);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const clickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -73,6 +96,96 @@ export default function MetronomeScreen() {
   useEffect(() => {
     currentBpmRef.current = bpm;
   }, [bpm]);
+
+  // 프리셋 목록 로드
+  useEffect(() => {
+    loadPresets();
+  }, []);
+
+  // 헤더에 버튼 추가
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <MetronomeHeaderButtons
+          onSavePress={() => setShowSaveModal(true)}
+          onPresetsPress={() => setShowPresetsModal(true)}
+        />
+      ),
+    });
+  }, [navigation]);
+
+  // 프리셋 목록 불러오기
+  const loadPresets = async () => {
+    try {
+      const data = await AsyncStorage.getItem(PRESETS_STORAGE_KEY);
+      if (data) {
+        const parsedPresets = JSON.parse(data) as MetronomePreset[];
+        // 최신순으로 정렬
+        const sortedPresets = parsedPresets.sort(
+          (a, b) => b.createdAt - a.createdAt
+        );
+        setPresets(sortedPresets);
+      }
+    } catch (error) {
+      console.error("Failed to load presets:", error);
+    }
+  };
+
+  // 프리셋 저장
+  const savePreset = async () => {
+    if (!presetName.trim()) {
+      return;
+    }
+
+    try {
+      const newPreset: MetronomePreset = {
+        id: Date.now().toString(),
+        name: presetName.trim(),
+        bpm,
+        beatPerBar,
+        clickPerBeat,
+        tempoName: selectedTempo.name,
+        createdAt: Date.now(),
+      };
+
+      const updatedPresets = [newPreset, ...presets];
+      await AsyncStorage.setItem(
+        PRESETS_STORAGE_KEY,
+        JSON.stringify(updatedPresets)
+      );
+      setPresets(updatedPresets);
+      setPresetName("");
+      setShowSaveModal(false);
+    } catch (error) {
+      console.error("Failed to save preset:", error);
+    }
+  };
+
+  // 프리셋 불러오기
+  const loadPreset = (preset: MetronomePreset) => {
+    setBpm(preset.bpm);
+    setBeatPerBar(preset.beatPerBar);
+    setClickPerBeat(preset.clickPerBeat);
+    const tempo = TEMPO_MARKINGS.find((t) => t.name === preset.tempoName);
+    if (tempo) {
+      setSelectedTempo(tempo);
+    }
+    setShowPresetsModal(false);
+  };
+
+  // 프리셋 삭제
+  const deletePreset = async (id: string) => {
+    try {
+      const updatedPresets = presets.filter((p) => p.id !== id);
+      await AsyncStorage.setItem(
+        PRESETS_STORAGE_KEY,
+        JSON.stringify(updatedPresets)
+      );
+      setPresets(updatedPresets);
+    } catch (error) {
+      console.error("Failed to delete preset:", error);
+    }
+  };
 
   useEffect(() => {
     if (isPlaying) {
@@ -503,7 +616,14 @@ export default function MetronomeScreen() {
       </ScrollView>
       {/* 하단 광고 */}
       {Platform.OS !== "web" && (
-        <View style={styles.adContainer}>
+        <View
+          style={[
+            styles.adContainer,
+            {
+              paddingBottom: Platform.OS === "android" ? insets.bottom + 8 : 8,
+            },
+          ]}
+        >
           <BannerAd
             unitId={AD_UNIT_ID}
             size={BannerAdSize.BANNER}
@@ -516,6 +636,155 @@ export default function MetronomeScreen() {
           />
         </View>
       )}
+
+      {/* 저장 모달 */}
+      <Modal
+        visible={showSaveModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSaveModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowSaveModal(false)}
+        >
+          <Pressable
+            style={[
+              styles.modalContent,
+              styles.saveModalContent,
+              { backgroundColor, borderColor },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <TextInput
+              style={[
+                styles.textInput,
+                { backgroundColor: borderColor, color: textColor, borderColor },
+              ]}
+              placeholder="프리셋 이름을 입력하세요"
+              placeholderTextColor={textColor + "80"}
+              value={presetName}
+              onChangeText={setPresetName}
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <Pressable
+                onPress={() => {
+                  setShowSaveModal(false);
+                  setPresetName("");
+                }}
+                style={[
+                  styles.modalButton,
+                  styles.modalButtonCancel,
+                  { borderColor },
+                ]}
+              >
+                <ThemedText
+                  style={[styles.modalButtonText, { color: textColor }]}
+                >
+                  취소
+                </ThemedText>
+              </Pressable>
+              <Pressable
+                onPress={savePreset}
+                style={[
+                  styles.modalButton,
+                  styles.modalButtonSave,
+                  { backgroundColor: tintColor },
+                ]}
+              >
+                <ThemedText
+                  style={[styles.modalButtonText, { color: backgroundColor }]}
+                >
+                  저장
+                </ThemedText>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* 프리셋 목록 모달 */}
+      <Modal
+        visible={showPresetsModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPresetsModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowPresetsModal(false)}
+        >
+          <Pressable
+            style={[
+              styles.modalContent,
+              styles.presetsModalContent,
+              { backgroundColor, borderColor },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHeader}>
+              <ThemedText
+                type="subtitle"
+                style={[styles.modalTitle, { color: textColor }]}
+              >
+                저장된 프리셋
+              </ThemedText>
+              <Pressable
+                onPress={() => setShowPresetsModal(false)}
+                style={styles.closeButton}
+              >
+                <MaterialIcons name="close" size={24} color={textColor} />
+              </Pressable>
+            </View>
+            {presets.length === 0 ? (
+              <View style={styles.emptyPresets}>
+                <ThemedText style={[styles.emptyText, { color: textColor }]}>
+                  저장된 프리셋이 없습니다
+                </ThemedText>
+              </View>
+            ) : (
+              <ScrollView style={styles.presetsList}>
+                {presets.map((preset) => (
+                  <View
+                    key={preset.id}
+                    style={[styles.presetItem, { borderColor }]}
+                  >
+                    <Pressable
+                      onPress={() => loadPreset(preset)}
+                      style={styles.presetItemContent}
+                    >
+                      <View style={styles.presetInfo}>
+                        <ThemedText
+                          style={[styles.presetName, { color: textColor }]}
+                        >
+                          {preset.name}
+                        </ThemedText>
+                        <ThemedText
+                          style={[styles.presetDetails, { color: textColor }]}
+                        >
+                          BPM: {preset.bpm} | Beat/bar: {preset.beatPerBar} |
+                          Click/beat: {preset.clickPerBeat} | {preset.tempoName}
+                        </ThemedText>
+                      </View>
+                      <Pressable
+                        onPress={() => deletePreset(preset.id)}
+                        style={styles.deleteButton}
+                      >
+                        <MaterialIcons
+                          name="delete"
+                          size={20}
+                          color="#ff4444"
+                        />
+                      </Pressable>
+                    </Pressable>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </ThemedView>
   );
 }
@@ -585,17 +854,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   beatSection: {
+    width: "100%",
     alignItems: "center",
-    gap: 24,
+    marginBottom: 8,
   },
   beatDots: {
     flexDirection: "row",
-    gap: 12,
+    width: "100%",
+    gap: 4,
   },
   beatDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    minWidth: 0,
   },
   timeSignatureSection: {
     width: "100%",
@@ -648,6 +920,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     overflow: "hidden",
   },
+  saveModalContent: {
+    width: "85%",
+    maxWidth: 400,
+    borderRadius: 16,
+    padding: 24,
+    overflow: "visible",
+  },
   optionsScrollView: {
     maxHeight: 300,
   },
@@ -694,6 +973,107 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.dark.background,
-    paddingVertical: 8,
+    paddingTop: 8,
+  },
+  presetsModalContent: {
+    width: "85%",
+    maxWidth: 400,
+    maxHeight: "70%",
+    borderRadius: 16,
+    borderWidth: 2,
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  textInput: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalButtonCancel: {
+    borderWidth: 1,
+  },
+  modalButtonSave: {
+    // backgroundColor is set inline
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  emptyPresets: {
+    padding: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    opacity: 0.6,
+  },
+  presetsList: {
+    maxHeight: 400,
+    marginBottom: 16,
+  },
+  presetItem: {
+    borderBottomWidth: 1,
+    marginBottom: 8,
+  },
+  presetItemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+  },
+  presetInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  presetName: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  presetDetails: {
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  addPresetButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  addPresetButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
