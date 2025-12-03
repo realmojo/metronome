@@ -31,6 +31,8 @@ const DEFAULT_BPM = 80;
 // 실제 광고 단위 ID 사용
 const AD_UNIT_ID = __DEV__
   ? TestIds.BANNER
+  : Platform.OS === "ios"
+  ? "ca-app-pub-9130836798889522/5633395195"
   : "ca-app-pub-9130836798889522/3277174687";
 
 const NOTES = [

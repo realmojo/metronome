@@ -35,6 +35,8 @@ const MAX_BPM = 300;
 const DEFAULT_BPM = 120;
 const AD_UNIT_ID = __DEV__
   ? TestIds.BANNER
+  : Platform.OS === "ios"
+  ? "ca-app-pub-9130836798889522/5633395195"
   : "ca-app-pub-9130836798889522/3277174687";
 
 const TEMPO_MARKINGS = [
