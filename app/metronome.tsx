@@ -35,7 +35,7 @@ const MAX_BPM = 300;
 const DEFAULT_BPM = 120;
 const AD_UNIT_ID = __DEV__
   ? TestIds.BANNER
-  : "ca-app-pub-1963334904140891/6754025890";
+  : "ca-app-pub-9130836798889522/3277174687";
 
 const TEMPO_MARKINGS = [
   { name: "Larghissimo", nameKo: "라르기시모", bpm: 24 },
@@ -661,7 +661,7 @@ export default function MetronomeScreen() {
                 styles.textInput,
                 { backgroundColor: borderColor, color: textColor, borderColor },
               ]}
-              placeholder="프리셋 이름을 입력하세요"
+              placeholder="Enter preset name"
               placeholderTextColor={textColor + "80"}
               value={presetName}
               onChangeText={setPresetName}
@@ -682,7 +682,7 @@ export default function MetronomeScreen() {
                 <ThemedText
                   style={[styles.modalButtonText, { color: textColor }]}
                 >
-                  취소
+                  Cancel
                 </ThemedText>
               </Pressable>
               <Pressable
@@ -696,7 +696,7 @@ export default function MetronomeScreen() {
                 <ThemedText
                   style={[styles.modalButtonText, { color: backgroundColor }]}
                 >
-                  저장
+                  Save
                 </ThemedText>
               </Pressable>
             </View>
@@ -728,7 +728,7 @@ export default function MetronomeScreen() {
                 type="subtitle"
                 style={[styles.modalTitle, { color: textColor }]}
               >
-                저장된 프리셋
+                Saved Presets
               </ThemedText>
               <Pressable
                 onPress={() => setShowPresetsModal(false)}
@@ -740,7 +740,7 @@ export default function MetronomeScreen() {
             {presets.length === 0 ? (
               <View style={styles.emptyPresets}>
                 <ThemedText style={[styles.emptyText, { color: textColor }]}>
-                  저장된 프리셋이 없습니다
+                  No saved presets
                 </ThemedText>
               </View>
             ) : (

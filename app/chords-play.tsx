@@ -24,7 +24,9 @@ import { useNavigation } from "@react-navigation/native";
 
 const AD_UNIT_ID = __DEV__
   ? TestIds.BANNER
-  : "ca-app-pub-1963334904140891/6754025890";
+  : Platform.OS === "ios"
+  ? "ca-app-pub-9130836798889522/5633395195"
+  : "ca-app-pub-9130836798889522/3277174687";
 
 const CHORDS_PRESETS_STORAGE_KEY = "@chords:presets";
 
@@ -374,28 +376,27 @@ export default function ChordsPlayScreen() {
           )}
         </View>
       </ScrollView>
+
       {/* 하단 광고 */}
-      {Platform.OS !== "web" && (
-        <View
-          style={[
-            styles.adContainer,
-            {
-              paddingBottom: Platform.OS === "android" ? insets.bottom + 8 : 8,
-            },
-          ]}
-        >
-          <BannerAd
-            unitId={AD_UNIT_ID}
-            size={BannerAdSize.BANNER}
-            requestOptions={{
-              requestNonPersonalizedAdsOnly: true,
-            }}
-            onAdFailedToLoad={(error) => {
-              console.error("Ad failed to load:", error);
-            }}
-          />
-        </View>
-      )}
+      <View
+        style={[
+          styles.adContainer,
+          {
+            paddingBottom: Platform.OS === "android" ? insets.bottom + 8 : 8,
+          },
+        ]}
+      >
+        <BannerAd
+          unitId={AD_UNIT_ID}
+          size={BannerAdSize.BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+          onAdFailedToLoad={(error) => {
+            console.error("Ad failed to load:", error);
+          }}
+        />
+      </View>
 
       {/* 프리셋 목록 모달 */}
       <Modal

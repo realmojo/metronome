@@ -59,7 +59,7 @@ export default function SettingsScreen() {
               Version
             </ThemedText>
             <ThemedText style={[styles.infoValue, { color: textColor }]}>
-              v1.0.0
+              v1.0.1
             </ThemedText>
           </ThemedView>
         </ThemedView>

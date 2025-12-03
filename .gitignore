@@ -13,6 +13,7 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
@@ -41,3 +42,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Android keystore files (keep this at the end)
+android/keystore.properties
+android/app/release.keystore

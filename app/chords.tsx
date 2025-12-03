@@ -27,9 +27,11 @@ import { useNavigation } from "@react-navigation/native";
 const MIN_BPM = 30;
 const MAX_BPM = 300;
 const DEFAULT_BPM = 80;
+
+// 실제 광고 단위 ID 사용
 const AD_UNIT_ID = __DEV__
   ? TestIds.BANNER
-  : "ca-app-pub-1963334904140891/6754025890";
+  : "ca-app-pub-9130836798889522/3277174687";
 
 const NOTES = [
   "C",
@@ -535,14 +537,14 @@ export default function ChordsScreen() {
               type="subtitle"
               style={[styles.modalTitle, { color: textColor }]}
             >
-              프리셋 저장
+              Save Preset
             </ThemedText>
             <TextInput
               style={[
                 styles.textInput,
                 { backgroundColor: borderColor, color: textColor, borderColor },
               ]}
-              placeholder="프리셋 이름을 입력하세요"
+              placeholder="Enter preset name"
               placeholderTextColor={textColor + "80"}
               value={presetName}
               onChangeText={setPresetName}
@@ -563,7 +565,7 @@ export default function ChordsScreen() {
                 <ThemedText
                   style={[styles.modalButtonText, { color: textColor }]}
                 >
-                  취소
+                  Cancel
                 </ThemedText>
               </Pressable>
               <Pressable
@@ -577,7 +579,7 @@ export default function ChordsScreen() {
                 <ThemedText
                   style={[styles.modalButtonText, { color: backgroundColor }]}
                 >
-                  저장
+                  Save
                 </ThemedText>
               </Pressable>
             </View>
@@ -609,7 +611,7 @@ export default function ChordsScreen() {
                 type="subtitle"
                 style={[styles.modalTitle, { color: textColor }]}
               >
-                Presets
+                Saved Presets
               </ThemedText>
               <Pressable
                 onPress={() => setShowPresetsModal(false)}
@@ -621,7 +623,7 @@ export default function ChordsScreen() {
             {presets.length === 0 ? (
               <View style={styles.emptyPresets}>
                 <ThemedText style={[styles.emptyText, { color: textColor }]}>
-                  No presets saved
+                  No saved presets
                 </ThemedText>
               </View>
             ) : (
